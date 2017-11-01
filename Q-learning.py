@@ -32,7 +32,7 @@ tDiag = {
 #Installed using: pip install numpy matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import pprint
+import random
 
 '''
 All possible locations for the clothes: "R: Room", "U: Upper Body", "F: Feet"
@@ -53,18 +53,22 @@ For state reference check HEADER(1)
 '''
 states = ['RRRR', 'RRFR', 'RRFF', 'URRR', 'URFR', 'UURR', 'URFF', 'UUFR', 'UUFF']
 
-def getDiff(s1, s2):
+def getDiff(state1, state2):
     count = 0
-    for i in range(len(s1)):
-        if s1[i] != s2[i]:
+    for i in range(len(state1)):
+        if state1[i] != state2[i]:
             count += 1
     return count
 
-def isFinalState(s):
-    return s == 'UUFF'
+def isGoalState(state):
+    return state == 'UUFF'
 
-def isInitialState(s):
-    return s == 'RRRR'
+def getGoalStateIndex():
+    return states.index('UUFF')
+
+def getInitialStateIndex():
+    return states.index('RRRR')
+    
         
 '''
 This function is used to build the Transition Diagram.(tDiag)
@@ -95,7 +99,7 @@ def buildRMatrix(tD):
     R = -1 * np.asmatrix(np.ones((n, n), dtype=np.int))
     for fromState, toStates in tD.items():
         for toState in toStates:
-            if isFinalState(toState):
+            if isGoalState(toState):
                 R[states.index(fromState), states.index(toState)] = 100
             else:
                 R[states.index(fromState), states.index(toState)] = 0
@@ -115,14 +119,35 @@ def solveUsingQ(Q):
 		if len(steps) > 50: break
 	return steps
 
+def getLegalActions(state, R):
+    legalActions = []
+    for nextState in range(R[state].shape[1]):
+        if R[state, nextState] >= 0:
+            legalActions.append(nextState)
+    return legalActions
+
 '''
 Q-Learning Function.
 This function takes as input the R-Matrix, gamma, alpha and Number of Episodes to train Q for.
 It returns the Q-Matrix as output.
 '''
 def learn_Q(R, gamma = 0.8, alpha = 0.0, numEpisodes = 0):
-	#Write your code to do the work here.
-	return Q
+    n = len(states)
+    goalState = getGoalStateIndex()
+    initialState = getInitialStateIndex()
+    Q = np.asmatrix(np.zeros((n, n), dtype=np.float))
+    currentState = initial_state
+    episodes = 0
+    
+    while episodes < numEpisodes:
+        if currentState == goalState:
+            episodes += 1
+        legalActions = getLegalActions(currentState, R)
+        actionSelected = random.choice(legalActions)
+        Q[currentState, actionSelected] = Q[currentState, actionSelected] + alpha * (R[currentState, actionSelected] + gamma*(Q[actionSelected].max() - Q[currentState, actionSelected]))
+        currentState = actionSelected
+        
+    return Q
 
 
 #variables that hold returned values from the defined functions.
@@ -130,8 +155,8 @@ tDiag = buildTransitionDiag(states)
 R = buildRMatrix(tDiag)
 
 #Define the initial and goal state with the corresponding index they hold in variable "states".
-initial_state = 0
-goal_state = 0
+initial_state = getInitialStateIndex()
+goal_state = getGoalStateIndex()
 
 '''
 Problem: Perform 500 episodes of training, and after every 2nd iteration,
@@ -144,7 +169,7 @@ trainSteps = []#Variable to save iteration# and step-count.
 runs = [i for i in range(10,200,2)]#List contatining the runs from 10 -> 200, with a jump of 2.
 
 for i in runs:
-	Q = learn_Q(R, alpha = 0.0, numEpisodes = i)
+	Q = learn_Q(R, alpha = 1, numEpisodes = i)
 	stepsTaken = len(solveUsingQ(Q))
 	trainSteps.append([i,stepsTaken])
 
