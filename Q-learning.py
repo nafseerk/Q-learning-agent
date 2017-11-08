@@ -140,12 +140,11 @@ def learn_Q(R, gamma = 0.8, alpha = 0.0, numEpisodes = 0):
     episodes = 0
     
     while episodes < numEpisodes:
-        if currentState == goalState:
-            episodes += 1
         legalActions = getLegalActions(currentState, R)
         actionSelected = random.choice(legalActions)
         Q[currentState, actionSelected] = Q[currentState, actionSelected] + alpha * (R[currentState, actionSelected] + gamma*(Q[actionSelected].max() - Q[currentState, actionSelected]))
         currentState = actionSelected
+        episodes += 1
         
     return Q
 
@@ -193,7 +192,7 @@ FOOTER: Save program output here:
 ==alpha = 0.1== 
 The best possible order to wear clothes is:
 
-RRRR -> RRFR -> RRFF -> URFF -> UUFF
+RRRR -> URRR -> URFR -> UUFR -> UUFF
 
 ==alpha = 0.5==
 The best possible order to wear clothes is:
@@ -203,10 +202,10 @@ RRRR -> URRR -> UURR -> UUFR -> UUFF
 ==alpha = 0.8==
 The best possible order to wear clothes is:
 
-RRRR -> URRR -> UURR -> UUFR -> UUFF
+RRRR -> URRR -> URFR -> UUFR -> UUFF
 
 ==alpha = 1==
 The best possible order to wear clothes is:
 
-RRRR -> RRFR -> URFR -> URFF -> UUFF
+RRRR -> URRR -> URFR -> UUFR -> UUFF
 '''
