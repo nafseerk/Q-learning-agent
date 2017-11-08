@@ -190,5 +190,23 @@ for i in path:
 print(tmp.rstrip(" ->"))
 '''
 FOOTER: Save program output here:
+==alpha = 0.1== 
+The best possible order to wear clothes is:
 
+RRRR -> RRFR -> RRFF -> URFF -> UUFF
+
+==alpha = 0.5==
+The best possible order to wear clothes is:
+
+RRRR -> URRR -> UURR -> UUFR -> UUFF
+
+==alpha = 0.8==
+The best possible order to wear clothes is:
+
+RRRR -> URRR -> UURR -> UUFR -> UUFF
+
+==alpha = 1==
+The best possible order to wear clothes is:
+
+RRRR -> RRFR -> URFR -> URFF -> UUFF
 '''
